@@ -1,6 +1,6 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQueries, useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeftIcon, MagnifyingGlassIcon, ChevronDownIcon, ChevronRightIcon, UserIcon, ArrowPathIcon, UsersIcon, TrashIcon, FilmIcon, FolderOpenIcon, ExclamationTriangleIcon, SignalIcon, VideoCameraIcon, TagIcon, EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, MagnifyingGlassIcon, ChevronDownIcon, ChevronRightIcon, UserIcon, ArrowPathIcon, UsersIcon, TrashIcon, FilmIcon, FolderOpenIcon, ExclamationTriangleIcon, SignalIcon, VideoCameraIcon, TagIcon, EllipsisHorizontalIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon, CheckIcon } from '@heroicons/react/24/solid';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import apiClient from '../api/client';
@@ -73,6 +73,8 @@ interface LeagueDetail {
   description?: string;
   monitored: boolean;
   enableDvr?: boolean;
+  neutralEpisodeTitles?: boolean;
+  hideEpisodeSpoilers?: boolean;
   keepAllEvents?: boolean;
   monitorType?: string;
   qualityProfileId?: number;
@@ -829,6 +831,22 @@ export default function LeagueDetailPage() {
     },
     onError: () => {
       toast.error('Failed to update league DVR scheduling');
+    },
+  });
+
+  // Spoiler options for what media servers are sent through the metadata
+  // agent API. Each checkbox saves only its own flag.
+  const updateEpisodeMetadataMutation = useMutation({
+    mutationFn: async (options: { neutralEpisodeTitles?: boolean; hideEpisodeSpoilers?: boolean }) => {
+      const response = await apiClient.put(`/leagues/${id}`, options);
+      return response.data;
+    },
+    onSuccess: async () => {
+      await queryClient.refetchQueries({ queryKey: ['league', id] });
+      toast.success('Media server episode options updated');
+    },
+    onError: () => {
+      toast.error('Failed to update media server episode options');
     },
   });
 
@@ -1943,6 +1961,46 @@ export default function LeagueDetailPage() {
                 )}
               </div>
             )}
+
+            {/* Media server episode text. The metadata agent API applies it at
+                once (on the server's next metadata refresh); Kodi NFO files get
+                it the next time they are written. */}
+            <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-red-900/30">
+              <div className="flex items-center gap-2 mb-3 md:mb-4">
+                <EyeSlashIcon className="w-4 h-4 md:w-5 md:h-5 text-red-400" />
+                <h3 className="text-xs md:text-sm font-semibold text-white">Media Server Episodes</h3>
+              </div>
+              <label className="flex items-start space-x-3 cursor-pointer mb-3">
+                <input
+                  type="checkbox"
+                  checked={league?.neutralEpisodeTitles ?? false}
+                  onChange={(e) => updateEpisodeMetadataMutation.mutate({ neutralEpisodeTitles: e.target.checked })}
+                  disabled={updateEpisodeMetadataMutation.isPending}
+                  className="mt-1 w-5 h-5 rounded border-gray-600 bg-gray-800 text-red-600 focus:ring-red-600"
+                />
+                <div>
+                  <span className="text-xs md:text-sm font-medium text-white">Neutral episode titles</span>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Title episodes as "Event · League Season · Round N · Venue" so the round and venue show in the episode list.
+                  </p>
+                </div>
+              </label>
+              <label className="flex items-start space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={league?.hideEpisodeSpoilers ?? false}
+                  onChange={(e) => updateEpisodeMetadataMutation.mutate({ hideEpisodeSpoilers: e.target.checked })}
+                  disabled={updateEpisodeMetadataMutation.isPending}
+                  className="mt-1 w-5 h-5 rounded border-gray-600 bg-gray-800 text-red-600 focus:ring-red-600"
+                />
+                <div>
+                  <span className="text-xs md:text-sm font-medium text-white">Hide spoilers</span>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Use that same neutral line as the episode summary instead of the event write-up, which often names the winner.
+                  </p>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
 

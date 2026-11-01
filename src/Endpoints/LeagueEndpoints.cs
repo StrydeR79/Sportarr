@@ -193,6 +193,8 @@ app.MapGet("/api/leagues/{id:int}", async (int id, SportarrDbContext db, FileNam
         league.SpecialEventsMonitorType,
         league.KeepAllEvents,
         league.AllowHighlights,
+        league.NeutralEpisodeTitles,
+        league.HideEpisodeSpoilers,
         league.RetentionDays,
         league.RootFolderId,
         Path = leaguePath,
@@ -1185,6 +1187,30 @@ app.MapPut("/api/leagues/{id:int}", async (int id, JsonElement body, SportarrDbC
         {
             logger.LogInformation("[LEAGUES] AllowHighlights changing from {Old} to {New}", league.AllowHighlights, newAllowHighlights);
             league.AllowHighlights = newAllowHighlights;
+        }
+    }
+
+    // Spoiler options for the metadata agent API: they only change what
+    // media servers are sent, so nothing else needs to react.
+    if (body.TryGetProperty("neutralEpisodeTitles", out var neutralTitlesProp) &&
+        (neutralTitlesProp.ValueKind == JsonValueKind.True || neutralTitlesProp.ValueKind == JsonValueKind.False))
+    {
+        var newNeutralTitles = neutralTitlesProp.GetBoolean();
+        if (league.NeutralEpisodeTitles != newNeutralTitles)
+        {
+            logger.LogInformation("[LEAGUES] NeutralEpisodeTitles changing from {Old} to {New}", league.NeutralEpisodeTitles, newNeutralTitles);
+            league.NeutralEpisodeTitles = newNeutralTitles;
+        }
+    }
+
+    if (body.TryGetProperty("hideEpisodeSpoilers", out var hideSpoilersProp) &&
+        (hideSpoilersProp.ValueKind == JsonValueKind.True || hideSpoilersProp.ValueKind == JsonValueKind.False))
+    {
+        var newHideSpoilers = hideSpoilersProp.GetBoolean();
+        if (league.HideEpisodeSpoilers != newHideSpoilers)
+        {
+            logger.LogInformation("[LEAGUES] HideEpisodeSpoilers changing from {Old} to {New}", league.HideEpisodeSpoilers, newHideSpoilers);
+            league.HideEpisodeSpoilers = newHideSpoilers;
         }
     }
 

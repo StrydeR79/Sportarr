@@ -2322,6 +2322,9 @@ namespace Sportarr.Api.Migrations.Postgres.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "intFormedYear");
 
+                    b.Property<bool>("HideEpisodeSpoilers")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("KeepAllEvents")
                         .HasColumnType("boolean");
 
@@ -2365,6 +2368,9 @@ namespace Sportarr.Api.Migrations.Postgres.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasAnnotation("Relational:JsonPropertyName", "strLeague");
+
+                    b.Property<bool>("NeutralEpisodeTitles")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("PlayoffTeamMode")
                         .HasColumnType("integer");

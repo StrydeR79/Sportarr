@@ -318,6 +318,19 @@ public class League
     public bool AllowHighlights { get; set; } = false;
 
     /// <summary>
+    /// Send media servers a neutral episode title ("{Title} · {League}
+    /// {Season} · Round {N} · {Venue}") instead of the bare event title, so
+    /// the round and venue show in the episode list.
+    /// </summary>
+    public bool NeutralEpisodeTitles { get; set; } = false;
+
+    /// <summary>
+    /// Send media servers the neutral line as the episode summary instead of
+    /// the hub write-up, which for finished events usually names the winner.
+    /// </summary>
+    public bool HideEpisodeSpoilers { get; set; } = false;
+
+    /// <summary>
     /// Custom search query template. Supports tokens: {League}, {Year}, {Month}, {Day},
     /// {Round}, {Week}, {EventTitle}, {HomeTeam}, {AwayTeam}, {vs}, {Season}
     /// If null/empty, uses default query generation based on sport type.
@@ -629,6 +642,8 @@ public class LeagueResponse
     public SpecialEventTeamMode PreseasonTeamMode { get; set; }
     public MonitorType SpecialEventsMonitorType { get; set; }
     public bool AllowHighlights { get; set; }
+    public bool NeutralEpisodeTitles { get; set; }
+    public bool HideEpisodeSpoilers { get; set; }
 
     /// <summary>
     /// Whether the DVR auto-scheduler may record this league.
@@ -790,6 +805,8 @@ public class LeagueResponse
             PreseasonTeamMode = league.PreseasonTeamMode,
             SpecialEventsMonitorType = league.SpecialEventsMonitorType,
             AllowHighlights = league.AllowHighlights,
+            NeutralEpisodeTitles = league.NeutralEpisodeTitles,
+            HideEpisodeSpoilers = league.HideEpisodeSpoilers,
             EnableDvr = league.EnableDvr,
             KeepAllEvents = league.KeepAllEvents,
             AlternateName = league.AlternateName,

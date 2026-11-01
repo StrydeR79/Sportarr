@@ -2260,6 +2260,9 @@ namespace Sportarr.Api.Migrations
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "intFormedYear");
 
+                    b.Property<bool>("HideEpisodeSpoilers")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("KeepAllEvents")
                         .HasColumnType("INTEGER");
 
@@ -2303,6 +2306,9 @@ namespace Sportarr.Api.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "strLeague");
+
+                    b.Property<bool>("NeutralEpisodeTitles")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("PlayoffTeamMode")
                         .HasColumnType("INTEGER");

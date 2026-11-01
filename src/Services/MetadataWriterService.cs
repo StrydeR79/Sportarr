@@ -56,7 +56,7 @@ public class MetadataWriterService : IMetadataWriterService
             {
                 if (provider.EventNfo)
                 {
-                    await WriteEventNfoAsync(evt, file, provider);
+                    await WriteEventNfoAsync(evt, league, file, provider);
                 }
 
                 if (provider.EventImages)
@@ -244,12 +244,12 @@ public class MetadataWriterService : IMetadataWriterService
         return providers.Where(p => TagHelper.TagsMatch(p.Tags, leagueTags)).ToList();
     }
 
-    private async Task WriteEventNfoAsync(Event evt, EventFile file, MetadataProvider provider)
+    private async Task WriteEventNfoAsync(Event evt, League? league, EventFile file, MetadataProvider provider)
     {
         var nfoPath = Path.ChangeExtension(file.FilePath, ".nfo");
 
         var episode = new XElement("episodedetails",
-            new XElement("title", evt.Title),
+            new XElement("title", EpisodeMetadataText.Title(evt, league)),
             new XElement("showtitle", evt.League?.Name ?? evt.Sport),
             new XElement("season", evt.SeasonNumber ?? evt.EventDate.Year),
             new XElement("episode", evt.EpisodeNumber!.Value),
@@ -265,9 +265,10 @@ public class MetadataWriterService : IMetadataWriterService
                 evt.ExternalId));
         }
 
-        if (!string.IsNullOrEmpty(evt.Description))
+        var plot = EpisodeMetadataText.Summary(evt, league);
+        if (!string.IsNullOrEmpty(plot))
         {
-            episode.Add(new XElement("plot", evt.Description));
+            episode.Add(new XElement("plot", plot));
         }
 
         episode.Add(new XElement("genre", evt.Sport));
